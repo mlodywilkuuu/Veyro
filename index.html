@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Veyro • Panel</title>
+
+  <meta
+    name="description"
+    content="Panel statusu i rozwoju bota Discord Veyro."
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #08080d;
+      --card: rgba(18, 18, 28, 0.82);
+      --card2: rgba(24, 24, 38, 0.82);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f5f5fa;
+      --muted: #9494a8;
+      --purple: #d000ff;
+      --purple2: #8b5cf6;
+      --green: #57f287;
+      --yellow: #fee75c;
+      --red: #ed4245;
+      --blue: #5865f2;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(208, 0, 255, 0.18),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(88, 101, 242, 0.13),
+          transparent 35%
+        ),
+        var(--bg);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      backdrop-filter: blur(20px);
+      background: rgba(8, 8, 13, 0.72);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 14px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--purple),
+          var(--purple2)
+        );
+
+      box-shadow:
+        0 0 35px rgba(208, 0, 255, 0.35);
+
+      font-size: 20px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      padding: 11px 16px;
+
+      border-radius: 12px;
+      border: 1px solid var(--border);
+
+      background: rgba(255, 255, 255, 0.04);
+
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(208, 0, 255, 0.45);
+    }
+
+    .button.primary {
+      border: none;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--purple),
+          var(--purple2)
+        );
+    }
+
+    header {
+      padding: 95px 0 55px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      margin-bottom: 20px;
+      padding: 8px 12px;
+
+      border-radius: 999px;
+
+      border: 1px solid rgba(87, 242, 135, 0.2);
+      background: rgba(87, 242, 135, 0.08);
+
+      color: var(--green);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+
+      background: var(--green);
+
+      box-shadow:
+        0 0 15px var(--green);
+    }
+
+    h1 {
+      font-size: clamp(48px, 8vw, 88px);
+      line-height: 0.95;
+      letter-spacing: -4px;
+    }
+
+    .gradient {
+      background:
+        linear-gradient(
+          135deg,
+          #ffffff,
+          #dc8aff,
+          var(--purple)
+        );
+
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-text {
+      max-width: 720px;
+      margin: 24px auto 0;
+
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      margin-top: 30px;
+
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    section {
+      padding: 28px 0;
+    }
+
+    .section-title {
+      margin-bottom: 20px;
+    }
+
+    .section-title h2 {
+      font-size: 30px;
+      letter-spacing: -1px;
+    }
+
+    .section-title p {
+      margin-top: 7px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns:
+        repeat(
+          auto-fit,
+          minmax(240px, 1fr)
+        );
+      gap: 16px;
+    }
+
+    .card {
+      padding: 22px;
+
+      border-radius: 18px;
+
+      border: 1px solid var(--border);
+
+      background:
+        linear-gradient(
+          180deg,
+          var(--card2),
+          var(--card)
+        );
+
+      box-shadow:
+        0 18px 50px rgba(0, 0, 0, 0.18);
+    }
+
+    .card:hover {
+      border-color: rgba(208, 0, 255, 0.25);
+    }
+
+    .module-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 14px;
+    }
+
+    .module-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      font-weight: 800;
+    }
+
+    .status {
+      padding: 5px 9px;
+      border-radius: 999px;
+
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .online {
+      color: var(--green);
+      background: rgba(87, 242, 135, 0.1);
+    }
+
+    .testing {
+      color: var(--yellow);
+      background: rgba(254, 231, 92, 0.1);
+    }
+
+    .development {
+      color: #ca8cff;
+      background: rgba(208, 0, 255, 0.1);
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns:
+        repeat(
+          auto-fit,
+          minmax(170px, 1fr)
+        );
+      gap: 16px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 900;
+    }
+
+    .stat-label {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .roadmap {
+      display: grid;
+      gap: 12px;
+    }
+
+    .roadmap-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+
+      padding: 16px 18px;
+
+      border-radius: 14px;
+      border: 1px solid var(--border);
+
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .roadmap-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .roadmap-item span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 55px;
+      padding: 28px 0;
+
+      text-align: center;
+
+      border-top: 1px solid var(--border);
+
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 650px) {
+      .nav-links .hide-mobile {
+        display: none;
+      }
+
+      header {
+        padding-top: 65px;
+      }
+
+      h1 {
+        letter-spacing: -2px;
+      }
+
+      .roadmap-item {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="container nav-inner">
+
+      <div class="brand">
+        <div class="logo">V</div>
+        <span>Veyro</span>
+      </div>
+
+      <div class="nav-links">
+
+        <a
+          class="button hide-mobile"
+          href="https://github.com/mlodywilkuuu/Veyro/issues"
+          target="_blank"
+        >
+          Issues
+        </a>
+
+        <a
+          class="button primary"
+          href="https://github.com/mlodywilkuuu/Veyro"
+          target="_blank"
+        >
+          GitHub
+        </a>
+
+      </div>
+
+    </div>
+  </nav>
+
+
+  <header>
+
+    <div class="container">
+
+      <div class="badge">
+        <span class="dot"></span>
+        Veyro działa
+      </div>
+
+      <h1>
+        <span class="gradient">Veyro</span>
+        <br />
+        Control Panel
+      </h1>
+
+      <p class="hero-text">
+        Centrum statusu, modułów i rozwoju bota Discord Veyro.
+        Projekt jest rozwijany i synchronizowany przez GitHub.
+      </p>
+
+      <div class="hero-actions">
+
+        <a
+          class="button primary"
+          href="#systemy"
+        >
+          ⚙️ Systemy
+        </a>
+
+        <a
+          class="button"
+          href="#roadmap"
+        >
+          🗺️ Roadmapa
+        </a>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="container">
+
+    <section>
+
+      <div class="stats">
+
+        <div class="card stat">
+          <div class="stat-value">v2.0.0</div>
+          <div class="stat-label">Wersja Veyro</div>
+        </div>
+
+        <div class="card stat">
+          <div class="stat-value">47</div>
+          <div class="stat-label">Komend</div>
+        </div>
+
+        <div class="card stat">
+          <div class="stat-value">24/7</div>
+          <div class="stat-label">Hosting</div>
+        </div>
+
+        <div class="card stat">
+          <div class="stat-value">GitHub</div>
+          <div class="stat-label">Automatyczne aktualizacje</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section id="systemy">
+
+      <div class="section-title">
+        <h2>Systemy Veyro</h2>
+        <p>
+          Najważniejsze moduły aktualnej wersji bota.
+        </p>
+      </div>
+
+
+      <div class="grid">
+
+        <div class="card">
+          <div class="module-top">
+            <div class="module-name">
+              🛡️ AutoModeracja
+            </div>
+            <div class="status online">
+              ONLINE
+            </div>
+          </div>
+
+          <p>
+            Linki, zaproszenia, spam, CAPS, wzmianki,
+            powtórzenia, blacklisty i wyjątki kanałów.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <div class="module-top">
+            <div class="module-name">
+              🔐 Permisje
+            </div>
+            <div class="status online">
+              ONLINE
+            </div>
+          </div>
+
+          <p>
+            Kontrola dostępu do komend według ról,
+            administratorów oraz wybranych kanałów.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <div class="module-top">
+            <div class="module-name">
+              🎫 Tickety
+            </div>
+            <div class="status online">
+              ONLINE
+            </div>
+          </div>
+
+          <p>
+            System ticketów wraz z kategoriami,
+            obsługą administracji i transkryptami.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <div class="module-top">
+            <div class="module-name">
+              📝 Rekrutacja
+            </div>
+            <div class="status online">
+              ONLINE
+            </div>
+          </div>
+
+          <p>
+            Formularze przez DM, panel oceny podań
+            oraz automatyczne nadawanie ról.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <div class="module-top">
+            <div class="module-name">
+              📊 Status Panel
+            </div>
+            <div class="status online">
+              ONLINE
+            </div>
+          </div>
+
+          <p>
+            Dynamiczny status usług Veyro,
+            ping, uptime i informacje systemowe.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <div class="module-top">
+            <div class="module-name">
+              📻 Radio 24/7
+            </div>
+            <div class="status testing">
+              TESTY
+            </div>
+          </div>
+
+          <p>
+            Radio Discord 24/7. Aktualnie trwa
+            poprawianie integracji YouTube i audio.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <div class="module-top">
+            <div class="module-name">
+              ⭐ Level
+            </div>
+            <div class="status online">
+              ONLINE
+            </div>
+          </div>
+
+          <p>
+            Poziomy użytkowników, XP,
+            ranking i nagrody za aktywność.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <div class="module-top">
+            <div class="module-name">
+              💰 Ekonomia
+            </div>
+            <div class="status online">
+              ONLINE
+            </div>
+          </div>
+
+          <p>
+            Portfel, nagrody dzienne,
+            praca oraz ranking ekonomii.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section id="roadmap">
+
+      <div class="section-title">
+        <h2>Roadmapa</h2>
+        <p>
+          Nad czym aktualnie pracujemy.
+        </p>
+      </div>
+
+
+      <div class="card roadmap">
+
+        <div class="roadmap-item">
+
+          <div>
+            <strong>
+              ✅ GitHub + hosting
+            </strong>
+
+            <span>
+              Automatyczne pobieranie kodu z repo Veyro.
+            </span>
+          </div>
+
+          <div class="status online">
+            GOTOWE
+          </div>
+
+        </div>
+
+
+        <div class="roadmap-item">
+
+          <div>
+            <strong>
+              🛡️ AutoModeracja 2.0
+            </strong>
+
+            <span>
+              Testy nowych filtrów oraz wyjątków.
+            </span>
+          </div>
+
+          <div class="status testing">
+            TESTY
+          </div>
+
+        </div>
+
+
+        <div class="roadmap-item">
+
+          <div>
+            <strong>
+              📻 Radio 24/7
+            </strong>
+
+            <span>
+              Poprawa YouTube, FFmpeg i obsługi błędów 429.
+            </span>
+          </div>
+
+          <div class="status testing">
+            TESTY
+          </div>
+
+        </div>
+
+
+        <div class="roadmap-item">
+
+          <div>
+            <strong>
+              🖥️ Panel WWW
+            </strong>
+
+            <span>
+              Rozbudowa panelu o dane pobierane z bota.
+            </span>
+          </div>
+
+          <div class="status development">
+            W TRAKCIE
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+  <footer>
+    © 2026 Veyro • Discord Bot
+  </footer>
+
+</body>
+</html>
