@@ -87,7 +87,7 @@ function startPanel({ client, db, save, commands, BOT_VERSION }) {
     cookie: {
       httpOnly: true,
       sameSite: 'lax',
-      secure: 'auto',
+      secure: BASE_URL.startsWith('https://'),
       maxAge: 1000 * 60 * 60 * 12
     }
   }));
@@ -101,6 +101,11 @@ function startPanel({ client, db, save, commands, BOT_VERSION }) {
   function needAuth(req, res, next) {
     if (!authorized(req)) return res.status(401).json({ error: 'Zaloguj się przez Discord.' });
     next();
+  }
+
+  function panelAudit(req, action, details='') {
+    const who = req.session?.user?.username || req.session?.user?.id || 'unknown';
+    console.log(`🌐 Panel: ${who} → ${action}${details ? ' | ' + details : ''}`);
   }
 
   function needCsrf(req, res, next) {
@@ -268,7 +273,8 @@ function startPanel({ client, db, save, commands, BOT_VERSION }) {
     if ('ignoredRoles' in body) c.ignoredRoles = cleanIds(body.ignoredRoles);
 
     save('automod-config');
-    res.json({ ok: true });
+    panelAudit(req, 'zapisano AutoMod', `enabled=${c.enabled}`);
+    res.json({ ok: true, applied: true, config: c });
   });
 
   app.get('/api/permissions', needAuth, (req, res) => {
@@ -293,7 +299,8 @@ function startPanel({ client, db, save, commands, BOT_VERSION }) {
       channelIds: cleanIds(body.channelIds)
     };
     save('command-permissions');
-    res.json({ ok: true, value: store.commands[name] });
+    panelAudit(req, 'zapisano permisje', '/' + name);
+    res.json({ ok: true, applied: true, value: store.commands[name] });
   });
 
   app.get('/api/radio', needAuth, (req, res) => {
@@ -314,7 +321,29 @@ function startPanel({ client, db, save, commands, BOT_VERSION }) {
     if ('volume' in body) c.volume = int(body.volume, 1, 100, c.volume ?? 35);
     if (['general','halloween','christmas'].includes(body.station)) c.station = body.station;
     save('radio-config');
-    res.json({ ok: true });
+    panelAudit(req, 'zapisano radio', `enabled=${c.enabled}, station=${c.station}`);
+    res.json({ ok: true, applied: true, config: {
+      enabled: Boolean(c.enabled),
+      channelId: c.channelId || '',
+      volume: c.volume ?? 35,
+      station: c.station || 'general'
+    } });
+  });
+
+  app.post('/api/connection-test', needAuth, needCsrf, async (req, res) => {
+    const guild = client.guilds.cache.get(GUILD_ID);
+    const result = {
+      ok: Boolean(client.user && guild),
+      bot: client.user?.tag || null,
+      botId: client.user?.id || null,
+      guild: guild?.name || null,
+      guildId: guild?.id || null,
+      ping: Math.max(0, Math.round(client.ws.ping || 0)),
+      uptimeMs: client.uptime || 0,
+      checkedAt: new Date().toISOString()
+    };
+    panelAudit(req, 'test połączenia', result.ok ? 'OK' : 'FAIL');
+    res.status(result.ok ? 200 : 503).json(result);
   });
 
   app.use((err, req, res, next) => {
