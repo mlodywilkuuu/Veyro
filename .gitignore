@@ -1,0 +1,15 @@
+node_modules/
+.env
+*.log
+data/
+*-config.json
+kary.json
+economy.json
+lvl.json
+sugestie.json
+tickets.json
+rekrutacja.json
+command-permissions.json
+panel-config.json
+panel-state.json
+.DS_Store
