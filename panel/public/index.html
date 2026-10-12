@@ -42,6 +42,7 @@
     </div>
 
     <section id="dashboard" class="panel active">
+      <div class="actions" style="margin:0 0 16px"><button id="testConnection" class="btn primary">Sprawdź połączenie panel ↔ bot</button></div>
       <div class="grid">
         <div class="card"><div class="muted">Bot</div><div id="botTag" class="stat">—</div></div>
         <div class="card"><div class="muted">Ping</div><div id="ping" class="stat">—</div></div>
@@ -189,6 +190,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
   b.classList.add('active'); $(b.dataset.tab).classList.add('active');
 });
 $('permCommand').addEventListener('change',showPermission);
+$('testConnection').onclick=async()=>{try{const r=await api('/api/connection-test',{method:'POST',body:'{}'});flash('Połączenie działa: '+r.bot+' ↔ '+r.guild+' • ping '+r.ping+' ms');}catch(e){flash(e.message,false)}};
 $('saveAutomod').onclick=async()=>{
   try{
     const body={};
@@ -200,7 +202,7 @@ $('saveAutomod').onclick=async()=>{
       mentions:{max:$('mentionsMax').value}
     };
     body.badWords=$('badWords').value; body.allowedDomains=$('allowedDomains').value; body.ignoredRoles=$('ignoredRoles').value;
-    await api('/api/automod',{method:'PUT',body:JSON.stringify(body)}); flash('AutoMod zapisany.');
+    const r=await api('/api/automod',{method:'PUT',body:JSON.stringify(body)}); flash(r.applied?'AutoMod zapisany i zastosowany w działającym bocie.':'AutoMod zapisany.');
   }catch(e){flash(e.message,false)}
 };
 $('savePerm').onclick=async()=>{
@@ -208,14 +210,14 @@ $('savePerm').onclick=async()=>{
     const n=$('permCommand').value;
     const body={mode:$('permMode').value,roleIds:$('permRoles').value,channelIds:$('permChannels').value};
     const r=await api('/api/permissions/'+encodeURIComponent(n),{method:'PUT',body:JSON.stringify(body)});
-    permissions[n]=r.value; flash('Permisje /'+n+' zapisane.');
+    permissions[n]=r.value; flash(r.applied?'Permisje /'+n+' zapisane i aktywne.':'Permisje /'+n+' zapisane.');
   }catch(e){flash(e.message,false)}
 };
 $('saveRadio').onclick=async()=>{
   try{
-    await api('/api/radio',{method:'PUT',body:JSON.stringify({
+    const r=await api('/api/radio',{method:'PUT',body:JSON.stringify({
       enabled:$('radioEnabled').checked,channelId:$('radioChannel').value,station:$('radioStation').value,volume:$('radioVolume').value
-    })}); flash('Konfiguracja radia zapisana.');
+    })}); flash(r.applied?'Konfiguracja radia zapisana.':'Konfiguracja radia zapisana.');
   }catch(e){flash(e.message,false)}
 };
 $('logout').onclick=async()=>{await fetch('/auth/logout',{method:'POST'});location.reload()};
