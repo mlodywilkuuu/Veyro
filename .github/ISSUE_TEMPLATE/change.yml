@@ -1,0 +1,54 @@
+name: Zmiana w Veyro
+description: Zaplanuj nową funkcję lub zmianę w bocie
+title: "[CHANGE] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Co zmieniamy?
+      description: Opisz dokładnie funkcję lub zmianę.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Moduł
+      options:
+        - AutoModeracja
+        - Moderacja
+        - Radio
+        - Rekrutacja
+        - Tickety
+        - Status
+        - Ekonomia
+        - Level
+        - Role
+        - Permisje
+        - Panel GitHub
+        - Inne
+    validations:
+      required: true
+  - type: dropdown
+    id: deploy
+    attributes:
+      label: Czy zmiana wymaga DEPLOY_COMMANDS=true?
+      options:
+        - Nie
+        - Tak
+        - Nie wiem
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Testy przed wydaniem
+      placeholder: |
+        - [ ] Bot startuje bez błędów
+        - [ ] Komenda działa
+        - [ ] Dane zapisują się poprawnie
+  - type: input
+    id: version
+    attributes:
+      label: Planowana wersja
+      placeholder: "np. 2.1.0"
